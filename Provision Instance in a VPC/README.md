@@ -1,4 +1,4 @@
-# Provisioning an EC2 Instance running Apache in a VPC with multiple subnets
+# Provisioning an EC2 Instance running Apache in a VPC with an EIP
 
 For ease of use you can use AWS Cloudshell or create a Cloud9 env
 
