@@ -1,7 +1,7 @@
 provider "aws" {
   region     = "us-east-1"
-  access_key = ""
-  secret_key = ""
+  access_key = "your_access_key"
+  secret_key = "your_secret_key"
 }
 
 # 1. Create vpc
@@ -101,7 +101,7 @@ resource "aws_security_group" "allow_web" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "allow_web"
   }
 }
@@ -113,11 +113,6 @@ resource "aws_network_interface" "web-server-nic" {
   subnet_id       = aws_subnet.subnet-1.id
   private_ips     = ["10.0.1.50"]
   security_groups = [aws_security_group.allow_web.id]
-
-  attachment {
-    instance     = aws_instance.web-server-instance.id
-    device_index = 0
-  }
 }
 
 # 8. Assign an Elastic IP to the network_interface created in step 7
@@ -143,6 +138,11 @@ resource "aws_instance" "web-server-instance" {
   instance_type     = "t2.micro"
   availability_zone = "us-east-1a"
   key_name          = "main-key"
+
+  network_interface {
+    device_index         = 0
+    network_interface_id = aws_network_interface.web-server-nic.id
+  }
 
   user_data = <<-EOF
                 #!/bin/bash
@@ -173,4 +173,3 @@ output "server_id" {
 #   key = "value"
 #   key2 = "another value"
 # }
-
