@@ -106,3 +106,54 @@ resource "aws_security_group" "allow_web" {
   }
 }
 
+# 7. Create a Network Interface with an IP in the subnet that was created in step 4
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface
+
+resource "aws_network_interface" "web-server-nic" {
+  subnet_id       = aws_subnet.subnet-1.id
+  private_ips     = ["10.0.1.50"]
+  security_groups = [aws_security_group.allow_web.id]
+
+  attachment {
+    instance     = aws_instance.web-server-instance.id
+    device_index = 0
+  }
+}
+
+# 8. Assign an Elastic IP to the network_interface created in step 7
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip
+
+
+resource "aws_eip" "one" {
+  vpc                       = true
+  network_interface         = aws_network_interface.web-server-nic.id
+  associate_with_private_ip = "10.0.1.50"
+  depends_on                = [aws_internet_gateway.gw]
+}
+
+output "server_public_ip" {
+  value = aws_eip.one.public_ip
+}
+
+# 9. Create an Ubuntu Instance and install, enable apache2
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
+
+resource "aws_instance" "web-server-instance" {
+  ami               = "ami-085925f297f89fce1"
+  instance_type     = "t2.micro"
+  availability_zone = "us-east-1a"
+  key_name          = "main-key"
+
+  user_data = <<-EOF
+                #!/bin/bash
+                sudo apt update -y
+                sudo apt install apache2 -y
+                sudo systemctl start apache2
+                sudo systemctl enable apache2
+                sudo bash -c 'echo your web server > /var/www/html/index.html'
+                EOF
+
+  tags = {
+    Name = "web-server"
+  }
+}
