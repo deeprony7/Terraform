@@ -44,6 +44,7 @@ More info: <https://registry.terraform.io/providers/hashicorp/aws/latest/docs/re
 Execute steps below execute the code:
 
 1. Replace _access_key_ and _secret_key_ parameters in provider section
+2. Create a Key Pair in your AWS environmet and name it "main-key"
 2. Run `terraform init` in the directory you have saved main.tf in
 3. Run `terraform plan` to check out the changes Terraform will make
 4. Run `terraform apply` to actually have terrafrom well, infrastructure terraform :)
