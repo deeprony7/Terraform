@@ -157,3 +157,20 @@ resource "aws_instance" "web-server-instance" {
     Name = "web-server"
   }
 }
+
+output "server_private_ip" {
+  value = aws_instance.web-server-instance.private_ip
+}
+
+output "server_id" {
+  value = aws_instance.web-server-instance.id
+}
+
+# template for resources
+
+# resource "<provider>_<resource_type>" "name" {
+#   config options...
+#   key = "value"
+#   key2 = "another value"
+# }
+
